@@ -190,7 +190,14 @@ public class Controller extends JFrame
                         System.out.println("B" + (i - 7) + " clicked");
                     }
                 }
+            }
 
+            for (int i = 0; i < view.getPits().length; i++)
+            {
+                if (view.getPits()[i].contains(e.getPoint()))
+                {
+                    model.update(i);
+                }
             }
         }
 
