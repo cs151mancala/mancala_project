@@ -1,6 +1,7 @@
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * The model class for Mancala that handles the game logic and data
@@ -22,6 +23,11 @@ public class Model
     private int[] prevPits; //This array holds the number of marbles in each pit in the previous turn
     private ArrayList<ChangeListener> listeners;
     private boolean playerATurn;
+    private int numUndosPlayerA;
+    private int numUndosPlayerB;
+    private boolean repeatTurn;
+    private boolean playerAWon;
+    private boolean playerBWon;
 
     /**
      * Constructor that initializes the instance variables
@@ -40,6 +46,11 @@ public class Model
 
         listeners = new ArrayList<>();
         playerATurn = true;
+
+        numUndosPlayerA = 3;
+
+        repeatTurn = false;
+        numUndosPlayerB = 3;
     }
 
     /**
@@ -64,12 +75,24 @@ public class Model
         {
             if (i == MANCALA_A_INDEX || i == MANCALA_B_INDEX)
             {
-                continue;
+                pits[i] = 0;
+                prevPits[i] = 0;
             }
             else
             {
                 pits[i] = numberOfStartingMarbles;
+                prevPits[i] = numberOfStartingMarbles;
             }
+        }
+
+        /*
+        This block of code is for when the player chooses to restart game
+         */
+        playerAWon = false;
+        playerBWon = false;
+        if (!playerATurn)
+        {
+            playerATurn = !playerATurn;
         }
 
         notifyChanges();
@@ -108,31 +131,39 @@ public class Model
 
     /**
      * Gets the array that holds the number of marbles in each pit
-     * @return
+     * @return the array that holds the number of marbles in eah pit
      */
     public int[] getPits()
     {
         return pits;
     }
 
+    /**
+     * Gets the array that holds the number of marbles in each pit from the previous turn
+     * @return the array that holds the number of marbles in each pit from the previous turn
+     */
     public int[] getPrevPits()
     {
         return prevPits;
     }
 
-    /**update changes when hit*/
+    /**
+     * Updates the array when the player plays a turn
+     * @param index the index of the pit the player clicked on
+     */
     public void update(int index)
     {
-        /*
-        This block of code fills the array of pits for the previous turn
-         */
-        for (int i = 0; i < prevPits.length; i++)
-        {
-            prevPits[i] = pits[i];
-        }
 
         if (turnIsValid(index)) //If the player clicked on their pit
         {
+            /*
+            This block of code fills the array of pits for the previous turn
+            */
+            for (int i = 0; i < prevPits.length; i++)
+            {
+                prevPits[i] = pits[i];
+            }
+
             int numberOfMar = pits[index];    //number of mar in the hit pit
             pits[index] = 0;        //Empty the pit the player clicked on
             int i = index + 1;        //the starting pit
@@ -171,17 +202,21 @@ public class Model
                     int oppositeIndex;
                     if (indexEndPit == FIRST_PIT_B_INDEX)
                     {
-                        oppositeIndex = 5;
+                        oppositeIndex = 6;
                     }
                     else if (indexEndPit == FIRST_PIT_B_INDEX + 1)
                     {
-                        oppositeIndex = 4;
+                        oppositeIndex = 5;
                     }
                     else if (indexEndPit == FIRST_PIT_B_INDEX + 2)
                     {
-                        oppositeIndex = 3;
+                        oppositeIndex = 4;
                     }
                     else if (indexEndPit == FIRST_PIT_B_INDEX + 3)
+                    {
+                        oppositeIndex = 3;
+                    }
+                    else if (indexEndPit == FIRST_PIT_B_INDEX + 4)
                     {
                         oppositeIndex = 2;
                     }
@@ -201,11 +236,15 @@ public class Model
             This block of code is for when the last stone the player drops
             is in their own mancala, they get a free turn
              */
+            repeatTurn = true;
             if (playerATurn && indexEndPit != MANCALA_A_INDEX ||
                 !playerATurn && indexEndPit != MANCALA_B_INDEX)
             {
                 playerATurn = !playerATurn;
+                repeatTurn = false;
             }
+
+            notifyChanges();
         }
         else
         {
@@ -229,7 +268,6 @@ public class Model
          */
         if (playerA_Pit == 0 || playerB_Pit == 0)
         {
-
             for (int j = 1; j < 7; j++) {
                 pits[7] += pits[j];
                 pits[0] += pits[14-j];
@@ -239,12 +277,87 @@ public class Model
 
             if (pits[7] > pits[0]) {
                 System.out.println("Player A wins");
+                playerAWon = true;
             } else {
                 System.out.println("Player B wins");
+                playerBWon = true;
             }
+
+            notifyChanges();
         }
 
-        notifyChanges();
+    }
+
+    /**
+     * Undos the turn if the player chooses to do so
+     */
+    public void undo()
+    {
+        if (!Arrays.equals(pits, prevPits))
+        {
+            if (playerATurn && numUndosPlayerB > 0 && !repeatTurn ||
+                playerATurn && numUndosPlayerA > 0 && repeatTurn)
+            {
+                if (!repeatTurn)
+                {
+                    numUndosPlayerB--;
+                }
+                else
+                {
+                    numUndosPlayerA--;
+                }
+                for (int i = 0; i < pits.length; i++)
+                {
+                    pits[i] = prevPits[i];
+                }
+
+                if (!repeatTurn)
+                {
+                    playerATurn = !playerATurn;
+                }
+                notifyChanges();
+            }
+            else if (!playerATurn && numUndosPlayerA > 0 && !repeatTurn ||
+                    !playerATurn && numUndosPlayerB > 0 && repeatTurn)
+            {
+                if (!repeatTurn)
+                {
+                    numUndosPlayerA--;
+                }
+                else
+                {
+                    numUndosPlayerB--;
+                }
+                for (int i = 0; i < pits.length; i++)
+                {
+                    pits[i] = prevPits[i];
+                }
+
+                if (!repeatTurn)
+                {
+                    playerATurn = !playerATurn;
+                }
+                notifyChanges();
+            }
+        }
+    }
+
+    /**
+     * Gets the number of undos for player A
+     * @return the number of undos for player A
+     */
+    public int getNumUndosPlayerA()
+    {
+        return numUndosPlayerA;
+    }
+
+    /**
+     * Gets the number of undos for player B
+     * @return
+     */
+    public int getNumUndosPlayerB()
+    {
+        return numUndosPlayerB;
     }
 
     /**
@@ -263,5 +376,21 @@ public class Model
     boolean isPlayerATurn()
     {
         return playerATurn;
+    }
+
+    /**
+     * Checks if player A won the game
+     * @return true if player A won the game, false otherwise
+     */
+    public boolean playerAWon() {
+        return playerAWon;
+    }
+
+    /**
+     * Checks if player B won the game
+     * @return true if player B won the game, false otherwise
+     */
+    public boolean playerBWon() {
+        return playerBWon;
     }
 }
