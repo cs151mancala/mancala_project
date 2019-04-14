@@ -19,8 +19,9 @@ public class Model
     public static final int NUMBER_OF_PITS = 14;
 
     private int[] pits; //This array holds the number of marbles in each pit
+    private int[] prevPits; //This array holds the number of marbles in each pit in the previous turn
     private ArrayList<ChangeListener> listeners;
-    boolean playerATurn;
+    private boolean playerATurn;
 
     /**
      * Constructor that initializes the instance variables
@@ -35,6 +36,7 @@ public class Model
         {
             pits[i] = 0;
         }
+        prevPits = new int[NUMBER_OF_PITS];
 
         listeners = new ArrayList<>();
         playerATurn = true;
@@ -57,8 +59,7 @@ public class Model
      * Fills all the pits (except the mancalas) with the number of starting marbles
      * @param numberOfStartingMarbles the number of starting marbles (either 3 or 4)
      */
-    public void fillPitsWithStartingMarbles(int numberOfStartingMarbles)
-    {
+    public void fillPitsWithStartingMarbles(int numberOfStartingMarbles) {
         for (int i = 0; i < pits.length; i++)
         {
             if (i == MANCALA_A_INDEX || i == MANCALA_B_INDEX)
@@ -75,12 +76,144 @@ public class Model
     }
 
     /**
+     * Checks if player A clicked pit A1-A6 or player B clicked pit B1-B6
+     * @param index the index of the pit the player clicked on
+     * @return true if turn is valid, false otherwise
+     */
+    private boolean turnIsValid(int index)
+    {
+        if (playerATurn)
+        {
+            if (index >= FIRST_PIT_A_INDEX && index <= LAST_PIT_A_INDEX)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (index >= FIRST_PIT_B_INDEX && index <= LAST_PIT_B_INDEX)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    /**
      * Gets the array that holds the number of marbles in each pit
      * @return
      */
     public int[] getPits()
     {
         return pits;
+    }
+
+    public int[] getPrevPits()
+    {
+        return prevPits;
+    }
+
+    /**update changes when hit*/
+    public void update(int index)
+    {
+        /*
+        This block of code fills the array of pits for the previous turn
+         */
+        for (int i = 0; i < prevPits.length; i++)
+        {
+            prevPits[i] = pits[i];
+        }
+
+        if (turnIsValid(index)) //If the player clicked on their pit
+        {
+            int numberOfMar = pits[index];    //number of mar in the hit pit
+            pits[index] = 0;        //Empty the pit the player clicked on
+            int i = index + 1;        //the starting pit
+            int indexEndPit = (index + numberOfMar) % 14; //the index of the ending pit
+            int numMarblesEndPit = pits[indexEndPit];  //Number of marbles in the ending pit
+
+            while (numberOfMar > 0)
+            {
+                /*
+                The if statement makes sure that the marble does not drop on the opponent's mancala
+                 */
+                if (playerATurn && i % 14 != MANCALA_B_INDEX ||
+                    !playerATurn && i % 14 != MANCALA_A_INDEX)
+                {
+                    pits[i % 14]++;
+                    numberOfMar--;
+                }
+                i++;
+            }
+
+            /*
+            This block of code is for when the last marble the player drops is in
+            an empty pit on their side, so they take that marble and all of the opponent's
+            marbles on the opposite side and place it in their mancala
+             */
+            if (numMarblesEndPit == 0 && indexEndPit != MANCALA_A_INDEX && indexEndPit != MANCALA_B_INDEX)
+            {
+                pits[7] += (pits[indexEndPit] + pits[14 - indexEndPit]);
+                pits[indexEndPit] = 0;
+                pits[14 - indexEndPit] = 0;
+            }
+
+
+            /*
+            This block of code is for when the last stone the player drops
+            is in their own mancala, they get a free turn
+             */
+            if (playerATurn && indexEndPit != MANCALA_A_INDEX ||
+                !playerATurn && indexEndPit != MANCALA_B_INDEX)
+            {
+                playerATurn = !playerATurn;
+            }
+        }
+        else
+        {
+            System.out.println("Turn is invalid");
+        }
+
+        /*
+        This block of code calculates the sum of A1-A6 for player A
+        and B1-B6 for player B
+         */
+        int playerA_Pit = 0;
+        int playerB_Pit = 0;
+        for (int j = 1; j < 7; j++)
+        {
+            playerA_Pit += pits[j];
+            playerB_Pit += pits[14-j];
+        }
+
+        /*
+        This block of code checks if either player won
+         */
+        if (playerA_Pit == 0 || playerB_Pit == 0)
+        {
+
+            for (int j = 1; j < 7; j++) {
+                pits[7] += pits[j];
+                pits[0] += pits[14-j];
+                pits[j] = 0;
+                pits[14-j] = 0;
+            }
+
+            if (pits[7] > pits[0]) {
+                System.out.println("Player A wins");
+            } else {
+                System.out.println("Player B wins");
+            }
+        }
+
+        notifyChanges();
     }
 
     /**

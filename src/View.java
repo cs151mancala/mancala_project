@@ -114,9 +114,20 @@ public class View extends JPanel
         This block of code draws the text for the player labels
          */
         g2.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-        g2.setColor(layout.getFontColor());
-        g2.drawString("Player B", (Controller.FRAME_WIDTH / 2) - 35, 60);
-        g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
+        if (model.isPlayerATurn())
+        {
+            g2.setColor(Color.RED);
+            g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
+            g2.setColor(layout.getFontColor());
+            g2.drawString("Player B", (Controller.FRAME_WIDTH / 2) - 35, 60);
+        }
+        else
+        {
+            g2.setColor(Color.RED);
+            g2.drawString("Player B", (Controller.FRAME_WIDTH / 2) - 35, 60);
+            g2.setColor(layout.getFontColor());
+            g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
+        }
 
         /*
         This block of code draws the marbles, marble count, and pit labels
@@ -131,6 +142,7 @@ public class View extends JPanel
              */
             int xCoord;
             int yCoord;
+            g2.setColor(layout.getFontColor());
             if (i >= Model.FIRST_PIT_A_INDEX && i <= Model.LAST_PIT_A_INDEX)
             {
                 xCoord = (int) boundingBox.getCenterX() - 20;
@@ -177,9 +189,11 @@ public class View extends JPanel
              */
             for (int j = 0; j < model.getPits()[i]; j++)
             {
-                int randX = rand.nextInt((int)boundingBox.getWidth() - Layout.MARBLE_WIDTH * 2 + 15);
-                int randY = rand.nextInt((int)boundingBox.getHeight() - Layout.MARBLE_HEIGHT * 2 - 15);
-                g2.drawImage(layout.getMarbleImage(), (int)(boundingBox.getX() + randX), (int)(boundingBox.getY() + randY), this);
+                int randX = rand.nextInt((int) boundingBox.getWidth() - Layout.MARBLE_WIDTH * 2 + 15);
+                int randY = rand.nextInt((int) boundingBox.getHeight() - Layout.MARBLE_HEIGHT * 2 - 15);
+
+                g2.drawImage(layout.getMarbleImage(), (int) (boundingBox.getX() + randX), (int) (boundingBox.getY() + randY), this);
+
             }
         }
     }
