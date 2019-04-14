@@ -135,6 +135,8 @@ public class View extends JPanel
             g2.setColor(layout.getFontColor());
             g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
         }
+        g2.drawString("Undos left: " + model.getNumUndosPlayerA(), (Controller.FRAME_WIDTH / 2) + 50, Controller.FRAME_HEIGHT - 60);
+        g2.drawString("Undos left: " + model.getNumUndosPlayerB(), (Controller.FRAME_WIDTH / 2) + 50, 60);
 
         /*
         This block of code draws the marbles, marble count, and pit labels
@@ -189,7 +191,7 @@ public class View extends JPanel
                 xCoord = (int) boundingBox.getMaxX() + 20;
                 yCoord = (int) boundingBox.getCenterY() - 20;
             }
-            g2.drawString("" + model.getPits()[i], xCoord, yCoord); //Drawst he number of marbles
+            g2.drawString("" + model.getPits()[i], xCoord, yCoord); //Draws he number of marbles
 
             /*
             This block of code is for drawing the marbles
@@ -210,6 +212,10 @@ public class View extends JPanel
         }
     }
 
+    /**
+     * Repaints the board when the state of the model changes
+     * @return ChangeListener that repaints the board
+     */
     public ChangeListener stateChanged()
     {
         return e ->

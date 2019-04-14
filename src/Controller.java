@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -16,6 +15,7 @@ public class Controller extends JFrame
 
     private Model model;
     private View view;
+    private int numRestarts;
 
     /**
      * Constructor that initializes the instance variables
@@ -26,6 +26,7 @@ public class Controller extends JFrame
     {
         this.model = model;
         this.view = view;
+        numRestarts = -1;
     }
 
     /**
@@ -36,7 +37,11 @@ public class Controller extends JFrame
         model.addChangeListener(view.stateChanged());   //Adds the view's change listener to the model
         model.fillPitsWithStartingMarbles(0);
 
-        addUndoButton();
+        numRestarts++;
+        if (numRestarts == 0)
+        {
+            addUndoButton();
+        }
 
         view.setBoardLayout(new RegularLayout());
 
@@ -61,7 +66,7 @@ public class Controller extends JFrame
 
         undoButton.addActionListener(e ->
         {
-
+            model.undo();
         });
         view.add(undoButton);
     }
@@ -147,6 +152,9 @@ public class Controller extends JFrame
         }
     }
 
+    /**
+     * MouseListener class that listens when the user clicks on a pit
+     */
     private class Listener implements MouseListener
     {
 
@@ -158,45 +166,38 @@ public class Controller extends JFrame
 
         @Override
         public void mousePressed(MouseEvent e) {
-            Point pointClicked = e.getPoint();
-
-            for (int i = 0; i < view.getPits().length; i++)
-            {
-                if (i == Model.MANCALA_A_INDEX)
-                {
-                    if (view.getPits()[i].contains(pointClicked))
-                    {
-                        System.out.println("Mancala A clicked");
-                    }
-                }
-                else if (i == Model.MANCALA_B_INDEX)
-                {
-                    if (view.getPits()[i].contains(pointClicked))
-                    {
-                        System.out.println("Mancala B clicked");
-                    }
-                }
-                else if (i >= Model.FIRST_PIT_A_INDEX && i <= Model.LAST_PIT_A_INDEX)
-                {
-                    if (view.getPits()[i].contains(pointClicked))
-                    {
-                        System.out.println("A" + i + " clicked");
-                    }
-                }
-                else
-                {
-                    if (view.getPits()[i].contains(pointClicked))
-                    {
-                        System.out.println("B" + (i - 7) + " clicked");
-                    }
-                }
-            }
 
             for (int i = 0; i < view.getPits().length; i++)
             {
                 if (view.getPits()[i].contains(e.getPoint()))
                 {
                     model.update(i);
+                }
+
+                if (model.playerAWon() || model.playerBWon())
+                {
+                    int choice;
+                    if (model.playerAWon())
+                    {
+                        choice = JOptionPane.showOptionDialog(Controller.this, "Player A won",
+                                null, JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                    }
+                    else
+                    {
+                        choice = JOptionPane.showOptionDialog(Controller.this, "Player B won",
+                                null, JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                    }
+
+                    if (choice == JOptionPane.OK_OPTION)
+                    {
+                        initialize();
+                    }
+                    else
+                    {
+                        System.exit(0);
+                    }
                 }
             }
         }
