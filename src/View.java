@@ -13,6 +13,7 @@ public class View extends JPanel
     private Layout layout;  //The game can have different layouts (different board, marbles)
     private Model model;    //Need a Model instance variable to access the data from it
     private Ellipse2D.Double[] pits;    //An array of the pits as ellipses
+    private int[] seeds;
 
     /**
      * Constructor that initializes the instance variables
@@ -22,6 +23,12 @@ public class View extends JPanel
     {
         this.model = model;
         pits = new Ellipse2D.Double[Model.NUMBER_OF_PITS];
+        seeds = new int[Model.NUMBER_OF_PITS];
+
+        for (int i = 0; i < seeds.length; i++)
+        {
+            seeds[i] = i;
+        }
 
         setPits();
     }
@@ -187,6 +194,11 @@ public class View extends JPanel
             /*
             This block of code is for drawing the marbles
              */
+            if (model.getPrevPits()[i] != model.getPits()[i])
+            {
+                seeds[i]++;
+            }
+            rand.setSeed(seeds[i]);
             for (int j = 0; j < model.getPits()[i]; j++)
             {
                 int randX = rand.nextInt((int) boundingBox.getWidth() - Layout.MARBLE_WIDTH * 2 + 15);

@@ -158,11 +158,42 @@ public class Model
             an empty pit on their side, so they take that marble and all of the opponent's
             marbles on the opposite side and place it in their mancala
              */
-            if (numMarblesEndPit == 0 && indexEndPit != MANCALA_A_INDEX && indexEndPit != MANCALA_B_INDEX)
+            if (numMarblesEndPit == 0)
             {
-                pits[7] += (pits[indexEndPit] + pits[14 - indexEndPit]);
-                pits[indexEndPit] = 0;
-                pits[14 - indexEndPit] = 0;
+                if (playerATurn && indexEndPit >= FIRST_PIT_A_INDEX && indexEndPit <= LAST_PIT_A_INDEX)
+                {
+                    pits[MANCALA_A_INDEX] += (pits[indexEndPit] + pits[14 - indexEndPit]);
+                    pits[indexEndPit] = 0;
+                    pits[14 - indexEndPit] = 0;
+                }
+                else if (!playerATurn && indexEndPit >= FIRST_PIT_B_INDEX && indexEndPit <= LAST_PIT_B_INDEX)
+                {
+                    int oppositeIndex;
+                    if (indexEndPit == FIRST_PIT_B_INDEX)
+                    {
+                        oppositeIndex = 5;
+                    }
+                    else if (indexEndPit == FIRST_PIT_B_INDEX + 1)
+                    {
+                        oppositeIndex = 4;
+                    }
+                    else if (indexEndPit == FIRST_PIT_B_INDEX + 2)
+                    {
+                        oppositeIndex = 3;
+                    }
+                    else if (indexEndPit == FIRST_PIT_B_INDEX + 3)
+                    {
+                        oppositeIndex = 2;
+                    }
+                    else
+                    {
+                        oppositeIndex = 1;
+                    }
+
+                    pits[MANCALA_B_INDEX] += pits[indexEndPit] + pits[oppositeIndex];
+                    pits[indexEndPit] = 0;
+                    pits[oppositeIndex] = 0;
+                }
             }
 
 
