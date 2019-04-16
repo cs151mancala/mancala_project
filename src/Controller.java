@@ -174,25 +174,34 @@ public class Controller extends JFrame
                     model.update(i);
                 }
 
-                if (model.playerAWon() || model.playerBWon())
+                /*
+                This block of code checks if the game ends
+                 */
+                if (model.playerAWon() || model.playerBWon() || model.tieGame())
                 {
                     int choice;
                     if (model.playerAWon())
                     {
                         choice = JOptionPane.showOptionDialog(Controller.this, "Player A won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                                JOptionPane.PLAIN_MESSAGE, null, null, null);
                     }
-                    else
+                    else if (model.playerBWon())
                     {
                         choice = JOptionPane.showOptionDialog(Controller.this, "Player B won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                                JOptionPane.PLAIN_MESSAGE, null, null, null);
+                    }
+                    else
+                    {
+                        choice = JOptionPane.showOptionDialog(Controller.this, "Tie game",
+                                    null, JOptionPane.OK_CANCEL_OPTION,
+                                    JOptionPane.PLAIN_MESSAGE, null, null, null);
                     }
 
                     if (choice == JOptionPane.OK_OPTION)
                     {
-                        initialize();
+                        System.exit(0);
                     }
                     else
                     {
