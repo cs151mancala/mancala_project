@@ -85,16 +85,6 @@ public class Model
             }
         }
 
-        /*
-        This block of code is for when the player chooses to restart game
-         */
-        playerAWon = false;
-        playerBWon = false;
-        if (!playerATurn)
-        {
-            playerATurn = !playerATurn;
-        }
-
         notifyChanges();
     }
 
@@ -246,10 +236,6 @@ public class Model
 
             notifyChanges();
         }
-        else
-        {
-            System.out.println("Turn is invalid");
-        }
 
         /*
         This block of code calculates the sum of A1-A6 for player A
@@ -269,17 +255,18 @@ public class Model
         if (playerA_Pit == 0 || playerB_Pit == 0)
         {
             for (int j = 1; j < 7; j++) {
-                pits[7] += pits[j];
-                pits[0] += pits[14-j];
+                pits[MANCALA_A_INDEX] += pits[j];
+                pits[MANCALA_B_INDEX] += pits[14-j];
                 pits[j] = 0;
                 pits[14-j] = 0;
             }
 
-            if (pits[7] > pits[0]) {
-                System.out.println("Player A wins");
+            if (pits[MANCALA_A_INDEX] > pits[MANCALA_B_INDEX])
+            {
                 playerAWon = true;
-            } else {
-                System.out.println("Player B wins");
+            }
+            else if (pits[MANCALA_B_INDEX] > MANCALA_A_INDEX)
+            {
                 playerBWon = true;
             }
 
@@ -392,5 +379,37 @@ public class Model
      */
     public boolean playerBWon() {
         return playerBWon;
+    }
+
+    /**
+     * Checks if it's a tie game at the end
+     * @return true if it's a tie game, false otherwise
+     */
+    public boolean tieGame()
+    {
+        if (pits[MANCALA_A_INDEX] != pits[MANCALA_B_INDEX])
+        {
+            return false;
+        }
+
+        int sum = 0;
+
+        for (int index = FIRST_PIT_A_INDEX; index <= LAST_PIT_A_INDEX; index++)
+        {
+            sum += pits[index];
+        }
+        for (int index = FIRST_PIT_B_INDEX; index <= LAST_PIT_B_INDEX; index++)
+        {
+            sum += pits[index];
+        }
+
+        if (sum == 0 && pits[MANCALA_A_INDEX] == pits[MANCALA_B_INDEX])
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
