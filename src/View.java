@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -8,7 +9,7 @@ import java.util.Random;
 /**
  * The view class that deals with the visual aspects of the game
  */
-public class View extends JPanel
+public class View extends JPanel implements ChangeListener
 {
     private Layout layout;  //The game can have different layouts (different board, marbles)
     private Model model;    //Need a Model instance variable to access the data from it
@@ -216,11 +217,10 @@ public class View extends JPanel
      * Repaints the board when the state of the model changes
      * @return ChangeListener that repaints the board
      */
-    public ChangeListener stateChanged()
+    @Override
+    public void stateChanged(ChangeEvent e)
     {
-        return e ->
-        {
-            this.repaint();
-        };
+        this.repaint();
     }
+
 }
