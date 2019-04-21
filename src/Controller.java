@@ -34,7 +34,7 @@ public class Controller extends JFrame
      */
     public void initialize()
     {
-        model.addChangeListener(view.stateChanged());   //Adds the view's change listener to the model
+        model.addChangeListener(view);   //Adds the view to the model
         model.fillPitsWithStartingMarbles(0);
 
         numRestarts++;
