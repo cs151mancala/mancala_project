@@ -13,6 +13,7 @@ public class View extends JPanel implements ChangeListener
 {
     private Layout layout;  //The game can have different layouts (different board, marbles)
     private Model model;    //Need a Model instance variable to access the data from it
+    private int[] numMarblesInPits;
     private Ellipse2D.Double[] pits;    //An array of the pits as ellipses
     private int[] seeds;
 
@@ -24,6 +25,7 @@ public class View extends JPanel implements ChangeListener
     {
         this.model = model;
         pits = new Ellipse2D.Double[Model.NUMBER_OF_PITS];
+        numMarblesInPits = model.getPits();
         seeds = new int[Model.NUMBER_OF_PITS];
 
         for (int i = 0; i < seeds.length; i++)
@@ -143,7 +145,7 @@ public class View extends JPanel implements ChangeListener
         This block of code draws the marbles, marble count, and pit labels
          */
         Random rand = new Random();
-        for (int i = 0; i < model.getPits().length; i++)
+        for (int i = 0; i < numMarblesInPits.length; i++)
         {
             Rectangle2D boundingBox = getPits()[i].getBounds2D();   //Gets the bounding box of the pit
 
@@ -192,17 +194,17 @@ public class View extends JPanel implements ChangeListener
                 xCoord = (int) boundingBox.getMaxX() + 20;
                 yCoord = (int) boundingBox.getCenterY() - 20;
             }
-            g2.drawString("" + model.getPits()[i], xCoord, yCoord); //Draws he number of marbles
+            g2.drawString("" + numMarblesInPits[i], xCoord, yCoord); //Draws he number of marbles
 
             /*
             This block of code is for drawing the marbles
              */
-            if (model.getPrevPits()[i] != model.getPits()[i])
+            if (model.getPrevPits()[i] != numMarblesInPits[i])
             {
                 seeds[i]++;
             }
             rand.setSeed(seeds[i]);
-            for (int j = 0; j < model.getPits()[i]; j++)
+            for (int j = 0; j < numMarblesInPits[i]; j++)
             {
                 int randX = rand.nextInt((int) boundingBox.getWidth() - Layout.MARBLE_WIDTH * 2 + 15);
                 int randY = rand.nextInt((int) boundingBox.getHeight() - Layout.MARBLE_HEIGHT * 2 - 15);
@@ -220,6 +222,7 @@ public class View extends JPanel implements ChangeListener
     @Override
     public void stateChanged(ChangeEvent e)
     {
+        numMarblesInPits = model.getPits();
         this.repaint();
     }
 

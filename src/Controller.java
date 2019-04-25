@@ -171,7 +171,7 @@ public class Controller extends JFrame
             {
                 if (view.getPits()[i].contains(e.getPoint()))
                 {
-                    model.update(i);
+                    model.playTurn(i);
                 }
 
                 /*

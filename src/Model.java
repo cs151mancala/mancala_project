@@ -141,7 +141,7 @@ public class Model
      * Updates the array when the player plays a turn
      * @param index the index of the pit the player clicked on
      */
-    public void update(int index)
+    public void playTurn(int index)
     {
 
         if (turnIsValid(index)) //If the player clicked on their pit
