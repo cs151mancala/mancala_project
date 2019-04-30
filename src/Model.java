@@ -172,7 +172,7 @@ public class Model
             int originalNumOfMar = pits[index];
             pits[index] = 0;        //Empty the pit the player clicked on
             int i = index + 1;        //the starting pit
-            int indexEndPit = (index + numberOfMar) % 14; //the index of the ending pit
+            int indexEndPit = (index + numberOfMar) % 14 + (index + numberOfMar) / 14; //the index of the ending pit
             int numMarblesEndPit = pits[indexEndPit];  //Number of marbles in the ending pit
 
             while (numberOfMar > 0)
@@ -194,6 +194,7 @@ public class Model
             an empty pit on their side, so they take that marble and all of the opponent's
             marbles on the opposite side and place it in their mancala
              */
+            System.out.println(indexEndPit);
             if (numMarblesEndPit == 0 && originalNumOfMar > 0)
             {
                 if (playerATurn && indexEndPit >= FIRST_PIT_A_INDEX && indexEndPit <= LAST_PIT_A_INDEX)
