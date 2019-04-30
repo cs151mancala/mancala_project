@@ -28,12 +28,12 @@ public class Model
     private boolean repeatTurn;
     private boolean playerAWon;
     private boolean playerBWon;
+    private boolean turnValid;
 
     /**
      * Constructor that initializes the instance variables
      */
-    public Model()
-    {
+    public Model() {
         /*
         This block of code initializes all the pits to have 0 marbles
          */
@@ -56,7 +56,7 @@ public class Model
     /**
      * Called inside mutator methods to notify changes to the view
      */
-    private void notifyChanges()
+    public void notifyChanges()
     {
         ChangeEvent event = new ChangeEvent(this);
 
@@ -85,6 +85,16 @@ public class Model
             }
         }
 
+        /*
+        This block of code is for when the player chooses to restart game
+         */
+        playerAWon = false;
+        playerBWon = false;
+        if (!playerATurn)
+        {
+            playerATurn = !playerATurn;
+        }
+        numUndosPlayerA = numUndosPlayerB = 3;
         notifyChanges();
     }
 
@@ -93,38 +103,44 @@ public class Model
      * @param index the index of the pit the player clicked on
      * @return true if turn is valid, false otherwise
      */
-    private boolean turnIsValid(int index)
-    {
+    public boolean turnIsValid(int index) {
+        //turnValid = false;
+
         if (playerATurn)
         {
             if (index >= FIRST_PIT_A_INDEX && index <= LAST_PIT_A_INDEX)
             {
-                return true;
+                turnValid = true;
+                //return true;
             }
             else
             {
-                return false;
+                turnValid = false;
+                //return false;
             }
         }
         else
         {
             if (index >= FIRST_PIT_B_INDEX && index <= LAST_PIT_B_INDEX)
             {
-                return true;
+                turnValid = true;
+                //return true;
             }
             else
             {
-                return false;
+                turnValid = false;
+                //return false;
             }
         }
+
+        return turnValid;
     }
 
     /**
      * Gets the array that holds the number of marbles in each pit
      * @return the array that holds the number of marbles in eah pit
      */
-    public int[] getPits()
-    {
+    public int[] getPits() {
         return pits;
     }
 
@@ -132,8 +148,7 @@ public class Model
      * Gets the array that holds the number of marbles in each pit from the previous turn
      * @return the array that holds the number of marbles in each pit from the previous turn
      */
-    public int[] getPrevPits()
-    {
+    public int[] getPrevPits() {
         return prevPits;
     }
 
@@ -141,8 +156,7 @@ public class Model
      * Updates the array when the player plays a turn
      * @param index the index of the pit the player clicked on
      */
-    public void playTurn(int index)
-    {
+    public void move(int index) {
 
         if (turnIsValid(index)) //If the player clicked on their pit
         {
@@ -155,6 +169,7 @@ public class Model
             }
 
             int numberOfMar = pits[index];    //number of mar in the hit pit
+            int originalNumOfMar = pits[index];
             pits[index] = 0;        //Empty the pit the player clicked on
             int i = index + 1;        //the starting pit
             int indexEndPit = (index + numberOfMar) % 14; //the index of the ending pit
@@ -166,7 +181,7 @@ public class Model
                 The if statement makes sure that the marble does not drop on the opponent's mancala
                  */
                 if (playerATurn && i % 14 != MANCALA_B_INDEX ||
-                    !playerATurn && i % 14 != MANCALA_A_INDEX)
+                        !playerATurn && i % 14 != MANCALA_A_INDEX)
                 {
                     pits[i % 14]++;
                     numberOfMar--;
@@ -179,7 +194,7 @@ public class Model
             an empty pit on their side, so they take that marble and all of the opponent's
             marbles on the opposite side and place it in their mancala
              */
-            if (numMarblesEndPit == 0)
+            if (numMarblesEndPit == 0 && originalNumOfMar > 0)
             {
                 if (playerATurn && indexEndPit >= FIRST_PIT_A_INDEX && indexEndPit <= LAST_PIT_A_INDEX)
                 {
@@ -227,14 +242,18 @@ public class Model
             is in their own mancala, they get a free turn
              */
             repeatTurn = true;
-            if (playerATurn && indexEndPit != MANCALA_A_INDEX ||
-                !playerATurn && indexEndPit != MANCALA_B_INDEX)
+            if (playerATurn && indexEndPit != MANCALA_A_INDEX && originalNumOfMar > 0||
+                    !playerATurn && indexEndPit != MANCALA_B_INDEX && originalNumOfMar > 0)
             {
                 playerATurn = !playerATurn;
                 repeatTurn = false;
             }
 
             notifyChanges();
+        }
+        else
+        {
+            turnInvalid();
         }
 
         /*
@@ -255,18 +274,15 @@ public class Model
         if (playerA_Pit == 0 || playerB_Pit == 0)
         {
             for (int j = 1; j < 7; j++) {
-                pits[MANCALA_A_INDEX] += pits[j];
-                pits[MANCALA_B_INDEX] += pits[14-j];
+                pits[7] += pits[j];
+                pits[0] += pits[14-j];
                 pits[j] = 0;
                 pits[14-j] = 0;
             }
 
-            if (pits[MANCALA_A_INDEX] > pits[MANCALA_B_INDEX])
-            {
+            if (pits[7] > pits[0]) {
                 playerAWon = true;
-            }
-            else if (pits[MANCALA_B_INDEX] > MANCALA_A_INDEX)
-            {
+            } else {
                 playerBWon = true;
             }
 
@@ -283,7 +299,7 @@ public class Model
         if (!Arrays.equals(pits, prevPits))
         {
             if (playerATurn && numUndosPlayerB > 0 && !repeatTurn ||
-                playerATurn && numUndosPlayerA > 0 && repeatTurn)
+                    playerATurn && numUndosPlayerA > 0 && repeatTurn)
             {
                 if (!repeatTurn)
                 {
@@ -360,7 +376,7 @@ public class Model
      * Checks which is the player's turn
      * @return true if it's player A's turn, false if it's player B's turn
      */
-    boolean isPlayerATurn()
+    public boolean isPlayerATurn()
     {
         return playerATurn;
     }
@@ -381,35 +397,10 @@ public class Model
         return playerBWon;
     }
 
-    /**
-     * Checks if it's a tie game at the end
-     * @return true if it's a tie game, false otherwise
-     */
-    public boolean tieGame()
-    {
-        if (pits[MANCALA_A_INDEX] != pits[MANCALA_B_INDEX])
-        {
-            return false;
-        }
-
-        int sum = 0;
-
-        for (int index = FIRST_PIT_A_INDEX; index <= LAST_PIT_A_INDEX; index++)
-        {
-            sum += pits[index];
-        }
-        for (int index = FIRST_PIT_B_INDEX; index <= LAST_PIT_B_INDEX; index++)
-        {
-            sum += pits[index];
-        }
-
-        if (sum == 0 && pits[MANCALA_A_INDEX] == pits[MANCALA_B_INDEX])
-        {
+    public boolean turnInvalid() {
+        if (!turnValid)
             return true;
-        }
         else
-        {
             return false;
-        }
     }
 }

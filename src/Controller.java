@@ -1,12 +1,14 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * Controller class that connects the model and view class
  */
-public class Controller extends JFrame
-{
+public class Controller extends JFrame {
     /*
      * This block of code is the dimensions of the frame
      */
@@ -15,7 +17,6 @@ public class Controller extends JFrame
 
     private Model model;
     private View view;
-    private int numRestarts;
 
     /**
      * Constructor that initializes the instance variables
@@ -26,7 +27,6 @@ public class Controller extends JFrame
     {
         this.model = model;
         this.view = view;
-        numRestarts = -1;
     }
 
     /**
@@ -34,41 +34,67 @@ public class Controller extends JFrame
      */
     public void initialize()
     {
-        model.addChangeListener(view);   //Adds the view to the model
+        model.addChangeListener(view);   //Adds the view's change listener to the model
         model.fillPitsWithStartingMarbles(0);
 
-        numRestarts++;
-        if (numRestarts == 0)
-        {
-            addUndoButton();
-        }
 
+        controllerPanel();
         view.setBoardLayout(new RegularLayout());
-
         this.add(view);
         this.addMouseListener(new Listener());
-
         this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-
         showSetMarblesWindow();
         showSetLayoutWindow();
     }
 
-    /**
-     * Adds the undo button
-     */
-    private void addUndoButton()
-    {
+
+    private void controllerPanel() {
+
         JButton undoButton = new JButton("Undo");
 
         undoButton.addActionListener(e ->
         {
             model.undo();
         });
+
+        JButton quitButton = new JButton("Quit");
+
+        quitButton.addActionListener(e ->
+        {
+            System.exit(0);
+        });
+
+        JButton regular = new JButton("Regular layout");
+
+        regular.addActionListener(e -> {
+            view.setBoardLayout(new RegularLayout());
+        });
+
+        JButton tutle = new JButton("Tutle format");
+
+        tutle.addActionListener(e -> {
+            view.setBoardLayout(new TurtleLayout());
+        });
+
+        JButton reset4 = new JButton("Reset game [4]");
+        JButton reset3 = new JButton("Reset game [3]");
+
+        reset4.addChangeListener(e -> {
+            model.fillPitsWithStartingMarbles(4);
+        });
+        reset3.addChangeListener(e -> {
+            model.fillPitsWithStartingMarbles(3);
+        });
+
         view.add(undoButton);
+        view.add(reset3);
+        view.add(reset4);
+        view.add(tutle);
+        view.add(regular);
+        view.add(quitButton);
     }
 
     /**
@@ -91,7 +117,7 @@ public class Controller extends JFrame
 
         int choice = JOptionPane.showOptionDialog(this, setMarblesPanel,
                 "Initial number of marbles", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, null, null);
+                JOptionPane.PLAIN_MESSAGE, null, null, null);
 
         int numberOfMarbles = 0;
         if (choice == JOptionPane.OK_OPTION)
@@ -155,53 +181,53 @@ public class Controller extends JFrame
     /**
      * MouseListener class that listens when the user clicks on a pit
      */
-    private class Listener implements MouseListener
-    {
-
-        @Override
-        public void mouseClicked(MouseEvent e)
-        {
-
-        }
+    private class Listener extends MouseAdapter {
 
         @Override
         public void mousePressed(MouseEvent e) {
+
 
             for (int i = 0; i < view.getPits().length; i++)
             {
                 if (view.getPits()[i].contains(e.getPoint()))
                 {
-                    model.playTurn(i);
+                    model.move(i);
+                    if (model.turnInvalid()) {
+                        JDialog error = new JDialog();
+                        error.add(new JLabel("Turn is invalid"));
+                        error.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+                        error.setLayout(new GridLayout(2, 2));
+                        JButton ok = new JButton("Okay");
+                        ok.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                error.dispose();
+                            }
+                        });
+                        error.add(ok);
+                        error.pack();
+                        error.setVisible(true);
+                    }
                 }
 
-                /*
-                This block of code checks if the game ends
-                 */
-                if (model.playerAWon() || model.playerBWon() || model.tieGame())
+                if (model.playerAWon() || model.playerBWon())
                 {
                     int choice;
                     if (model.playerAWon())
                     {
                         choice = JOptionPane.showOptionDialog(Controller.this, "Player A won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, null, null);
-                    }
-                    else if (model.playerBWon())
-                    {
-                        choice = JOptionPane.showOptionDialog(Controller.this, "Player B won",
-                                null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, null, null);
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
                     }
                     else
                     {
-                        choice = JOptionPane.showOptionDialog(Controller.this, "Tie game",
-                                    null, JOptionPane.OK_CANCEL_OPTION,
-                                    JOptionPane.PLAIN_MESSAGE, null, null, null);
+                        choice = JOptionPane.showOptionDialog(Controller.this, "Player B won",
+                                null, JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
                     }
-
                     if (choice == JOptionPane.OK_OPTION)
                     {
-                        System.exit(0);
+                        initialize();
                     }
                     else
                     {
@@ -209,21 +235,6 @@ public class Controller extends JFrame
                     }
                 }
             }
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-
         }
     }
 }
