@@ -187,6 +187,12 @@ public class Model
                     {
                         indexEndPit = 0;
                     }
+                    else if (indexEndPit == MANCALA_A_INDEX - 1)
+                    {
+                        j--;
+                        indexEndPit++;
+                        continue;
+                    }
                     else
                     {
                         indexEndPit++;
