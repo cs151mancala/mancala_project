@@ -104,7 +104,6 @@ public class Model
      * @return true if turn is valid, false otherwise
      */
     public boolean turnIsValid(int index) {
-        //turnValid = false;
 
         if (playerATurn)
         {
@@ -172,7 +171,30 @@ public class Model
             int originalNumOfMar = pits[index];
             pits[index] = 0;        //Empty the pit the player clicked on
             int i = index + 1;        //the starting pit
-            int indexEndPit = (index + numberOfMar) % 14 + (index + numberOfMar) / 14; //the index of the ending pit
+
+            int indexEndPit; //the index of the ending pit
+            if (playerATurn)
+            {
+                indexEndPit = (index + numberOfMar) % 14 + (index + numberOfMar) / 14;
+            }
+            else
+            {
+                indexEndPit = index;
+
+                for (int j = 1; j <= numberOfMar; j++)
+                {
+                    if (indexEndPit == LAST_PIT_B_INDEX)
+                    {
+                        indexEndPit = 0;
+                    }
+                    else
+                    {
+                        indexEndPit++;
+                    }
+                }
+            }
+
+
             int numMarblesEndPit = pits[indexEndPit];  //Number of marbles in the ending pit
 
             while (numberOfMar > 0)
@@ -243,7 +265,7 @@ public class Model
             is in their own mancala, they get a free turn
              */
             repeatTurn = true;
-            if (playerATurn && indexEndPit != MANCALA_A_INDEX && originalNumOfMar > 0||
+            if (playerATurn && indexEndPit != MANCALA_A_INDEX && originalNumOfMar > 0 ||
                     !playerATurn && indexEndPit != MANCALA_B_INDEX && originalNumOfMar > 0)
             {
                 playerATurn = !playerATurn;
