@@ -6,7 +6,7 @@ import java.util.Arrays;
 /**
  * The model class for Mancala that handles the game logic and data
  */
-public class Model
+public class MancalaLogic
 {
     /*
     Note the array is = {Mancala B, A1, A2, A3, A4, A5, A6, Mancala A, B1, B2, B3, B4, B5, B6}
@@ -33,7 +33,7 @@ public class Model
     /**
      * Constructor that initializes the instance variables
      */
-    public Model() {
+    public MancalaLogic() {
         /*
         This block of code initializes all the pits to have 0 marbles
          */
@@ -85,16 +85,6 @@ public class Model
             }
         }
 
-        /*
-        This block of code is for when the player chooses to restart game
-         */
-        playerAWon = false;
-        playerBWon = false;
-        if (!playerATurn)
-        {
-            playerATurn = !playerATurn;
-        }
-        numUndosPlayerA = numUndosPlayerB = 3;
         notifyChanges();
     }
 
@@ -110,12 +100,10 @@ public class Model
             if (index >= FIRST_PIT_A_INDEX && index <= LAST_PIT_A_INDEX)
             {
                 turnValid = true;
-                //return true;
             }
             else
             {
                 turnValid = false;
-                //return false;
             }
         }
         else
@@ -123,12 +111,10 @@ public class Model
             if (index >= FIRST_PIT_B_INDEX && index <= LAST_PIT_B_INDEX)
             {
                 turnValid = true;
-                //return true;
             }
             else
             {
                 turnValid = false;
-                //return false;
             }
         }
 
@@ -222,7 +208,6 @@ public class Model
             an empty pit on their side, so they take that marble and all of the opponent's
             marbles on the opposite side and place it in their mancala
              */
-            System.out.println(indexEndPit);
             if (numMarblesEndPit == 0 && originalNumOfMar > 0)
             {
                 if (playerATurn && indexEndPit >= FIRST_PIT_A_INDEX && indexEndPit <= LAST_PIT_A_INDEX)
