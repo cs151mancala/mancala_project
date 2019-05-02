@@ -2,11 +2,8 @@ public class MancalaTest
 {
     public static void main(String[] args)
     {
-        Model model = new Model();
-        View view = new View(model);
-        Controller controller = new Controller(model, view);
-
-        controller.initialize();
-
+        MancalaLogic model = new MancalaLogic();
+        MancalaLabel view = new MancalaLabel(model);
+        MancalaFrame controller = new MancalaFrame(model, view);
     }
 }

@@ -8,50 +8,37 @@ import java.awt.event.MouseEvent;
 /**
  * Controller class that connects the model and view class
  */
-public class Controller extends JFrame {
+public class MancalaFrame extends JFrame {
     /*
      * This block of code is the dimensions of the frame
      */
     public static final int FRAME_WIDTH = 1152;
     public static final int FRAME_HEIGHT = 658;
 
-    private Model model;
-    private View view;
+    private MancalaLogic model;
+    private MancalaLabel view;
 
     /**
      * Constructor that initializes the instance variables
      * @param model the model
      * @param view the view
      */
-    public Controller(Model model, View view)
+    public MancalaFrame(MancalaLogic model, MancalaLabel view)
     {
         this.model = model;
         this.view = view;
-    }
 
-    /**
-     * Shows the game window and does everything that's needed when the program starts
-     */
-    public void initialize()
-    {
         model.addChangeListener(view);   //Adds the view's change listener to the model
         model.fillPitsWithStartingMarbles(0);
 
-
-        controllerPanel();
-        view.setBoardLayout(new RegularLayout());
-        this.add(view);
-        this.addMouseListener(new Listener());
-        this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
-        showSetMarblesWindow();
-        showSetLayoutWindow();
+        initialize(model, view);
     }
 
+    private void initialize(MancalaLogic model, MancalaLabel view) {
 
-    private void controllerPanel() {
+        model.addChangeListener(view);   //Adds the view's change listener to the model
+        model.fillPitsWithStartingMarbles(0);
+
 
         JButton undoButton = new JButton("Undo");
 
@@ -73,9 +60,9 @@ public class Controller extends JFrame {
             view.setBoardLayout(new RegularLayout());
         });
 
-        JButton tutle = new JButton("Tutle format");
+        JButton turtle = new JButton("Turtle format");
 
-        tutle.addActionListener(e -> {
+        turtle.addActionListener(e -> {
             view.setBoardLayout(new TurtleLayout());
         });
 
@@ -92,9 +79,19 @@ public class Controller extends JFrame {
         view.add(undoButton);
         view.add(reset3);
         view.add(reset4);
-        view.add(tutle);
+        view.add(turtle);
         view.add(regular);
         view.add(quitButton);
+        view.setBoardLayout(new RegularLayout());
+        view.setBoardLayout(new RegularLayout());
+        this.add(view);
+        this.addMouseListener(new Listener());
+        this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+        showSetMarblesWindow();
+        showSetLayoutWindow();
     }
 
     /**
@@ -215,19 +212,19 @@ public class Controller extends JFrame {
                     int choice;
                     if (model.playerAWon())
                     {
-                        choice = JOptionPane.showOptionDialog(Controller.this, "Player A won",
+                        choice = JOptionPane.showOptionDialog(MancalaFrame.this, "Player A won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Ok", "Cancel"}, null);
                     }
                     else
                     {
-                        choice = JOptionPane.showOptionDialog(Controller.this, "Player B won",
+                        choice = JOptionPane.showOptionDialog(MancalaFrame.this, "Player B won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Restart", "Cancel"}, null);
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Ok", "Cancel"}, null);
                     }
                     if (choice == JOptionPane.OK_OPTION)
                     {
-                        initialize();
+                        System.exit(0);
                     }
                     else
                     {

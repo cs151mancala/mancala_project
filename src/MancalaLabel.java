@@ -9,10 +9,10 @@ import java.util.Random;
 /**
  * The view class that deals with the visual aspects of the game
  */
-public class View extends JPanel implements ChangeListener
+public class MancalaLabel extends JPanel implements ChangeListener
 {
     private Layout layout;  //The game can have different layouts (different board, marbles)
-    private Model model;    //Need a Model instance variable to access the data from it
+    private MancalaLogic model;    //Need a Model instance variable to access the data from it
     private int[] numMarblesInPits;
     private Ellipse2D.Double[] pits;    //An array of the pits as ellipses
     private int[] seeds;
@@ -21,12 +21,12 @@ public class View extends JPanel implements ChangeListener
      * Constructor that initializes the instance variables
      * @param model the model to access data from
      */
-    public View(Model model)
+    public MancalaLabel(MancalaLogic model)
     {
         this.model = model;
-        pits = new Ellipse2D.Double[Model.NUMBER_OF_PITS];
+        pits = new Ellipse2D.Double[MancalaLogic.NUMBER_OF_PITS];
         numMarblesInPits = model.getPits();
-        seeds = new int[Model.NUMBER_OF_PITS];
+        seeds = new int[MancalaLogic.NUMBER_OF_PITS];
 
         for (int i = 0; i < seeds.length; i++)
         {
@@ -59,17 +59,17 @@ public class View extends JPanel implements ChangeListener
         int differenceInXCoord = 150;
 
         int translate = 0; //Scaler is just for moving the x coordinates to the next pit
-        for (int i = 0; i < Model.NUMBER_OF_PITS; i++)
+        for (int i = 0; i < MancalaLogic.NUMBER_OF_PITS; i++)
         {
-            if (i == Model.MANCALA_B_INDEX) //If it's at the mancala B pit
+            if (i == MancalaLogic.MANCALA_B_INDEX) //If it's at the mancala B pit
             {
                 pits[i] = new Ellipse2D.Double(mancalaBStartingPoint.x, mancalaBStartingPoint.y, mancalaWidth, mancalaHeight);
             }
-            else if (i == Model.MANCALA_A_INDEX)    //If it's at the mancala A pit
+            else if (i == MancalaLogic.MANCALA_A_INDEX)    //If it's at the mancala A pit
             {
                 pits[i] = new Ellipse2D.Double(mancalaAStartingPoint.x, mancalaAStartingPoint.y, mancalaWidth, mancalaHeight);
             }
-            else if (i >= Model.FIRST_PIT_B_INDEX && i <= Model.LAST_PIT_B_INDEX)   //If it's at the regular pits for player B
+            else if (i >= MancalaLogic.FIRST_PIT_B_INDEX && i <= MancalaLogic.LAST_PIT_B_INDEX)   //If it's at the regular pits for player B
             {
                 pits[i] = new Ellipse2D.Double(pitBStartingPoint.x - differenceInXCoord * (translate - 1), pitBStartingPoint.y, pitWidth, pitHeight);
             }
@@ -78,7 +78,7 @@ public class View extends JPanel implements ChangeListener
                 pits[i] = new Ellipse2D.Double(pitAStartingPoint.x + differenceInXCoord * (translate - 1), pitAStartingPoint.y, pitWidth, pitHeight);
             }
 
-            if (i == Model.LAST_PIT_A_INDEX || i == Model.LAST_PIT_B_INDEX) //If we reach the last regular pit for player A or B, reset the scaler
+            if (i == MancalaLogic.LAST_PIT_A_INDEX || i == MancalaLogic.LAST_PIT_B_INDEX) //If we reach the last regular pit for player A or B, reset the scaler
             {
                 translate = 0;
             }
@@ -127,19 +127,19 @@ public class View extends JPanel implements ChangeListener
         if (model.isPlayerATurn())
         {
             g2.setColor(Color.RED);
-            g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
+            g2.drawString("Player A", (MancalaFrame.FRAME_WIDTH / 2) - 35, MancalaFrame.FRAME_HEIGHT - 60);
             g2.setColor(layout.getFontColor());
-            g2.drawString("Player B", (Controller.FRAME_WIDTH / 2) - 35, 60);
+            g2.drawString("Player B", (MancalaFrame.FRAME_WIDTH / 2) - 35, 60);
         }
         else
         {
             g2.setColor(Color.RED);
-            g2.drawString("Player B", (Controller.FRAME_WIDTH / 2) - 35, 60);
+            g2.drawString("Player B", (MancalaFrame.FRAME_WIDTH / 2) - 35, 60);
             g2.setColor(layout.getFontColor());
-            g2.drawString("Player A", (Controller.FRAME_WIDTH / 2) - 35, Controller.FRAME_HEIGHT - 60);
+            g2.drawString("Player A", (MancalaFrame.FRAME_WIDTH / 2) - 35, MancalaFrame.FRAME_HEIGHT - 60);
         }
-        g2.drawString("Undos left: " + model.getNumUndosPlayerA(), (Controller.FRAME_WIDTH / 2) + 50, Controller.FRAME_HEIGHT - 60);
-        g2.drawString("Undos left: " + model.getNumUndosPlayerB(), (Controller.FRAME_WIDTH / 2) + 50, 60);
+        g2.drawString("Undos left: " + model.getNumUndosPlayerA(), (MancalaFrame.FRAME_WIDTH / 2) + 50, MancalaFrame.FRAME_HEIGHT - 60);
+        g2.drawString("Undos left: " + model.getNumUndosPlayerB(), (MancalaFrame.FRAME_WIDTH / 2) + 50, 60);
 
         /*
         This block of code draws the marbles, marble count, and pit labels
@@ -155,7 +155,7 @@ public class View extends JPanel implements ChangeListener
             int xCoord;
             int yCoord;
             g2.setColor(layout.getFontColor());
-            if (i >= Model.FIRST_PIT_A_INDEX && i <= Model.LAST_PIT_A_INDEX)
+            if (i >= MancalaLogic.FIRST_PIT_A_INDEX && i <= MancalaLogic.LAST_PIT_A_INDEX)
             {
                 xCoord = (int) boundingBox.getCenterX() - 20;
                 yCoord = (int) boundingBox.getMaxY() + 5;
@@ -164,7 +164,7 @@ public class View extends JPanel implements ChangeListener
                 xCoord = (int) boundingBox.getCenterX() - 12;
                 yCoord = (int) boundingBox.getMinY() - 50;
             }
-            else if (i >= Model.FIRST_PIT_B_INDEX && i <= Model.LAST_PIT_B_INDEX)
+            else if (i >= MancalaLogic.FIRST_PIT_B_INDEX && i <= MancalaLogic.LAST_PIT_B_INDEX)
             {
                 xCoord = (int) boundingBox.getCenterX() - 20;
                 yCoord = (int) boundingBox.getMinY() - 50;
@@ -174,7 +174,7 @@ public class View extends JPanel implements ChangeListener
                 xCoord = (int) boundingBox.getCenterX() - 12;
                 yCoord = (int) boundingBox.getMaxY();
             }
-            else if (i == Model.MANCALA_A_INDEX)
+            else if (i == MancalaLogic.MANCALA_A_INDEX)
             {
                 xCoord = (int) boundingBox.getMinX() - 20;
                 yCoord = (int) boundingBox.getMaxY() + 3;
