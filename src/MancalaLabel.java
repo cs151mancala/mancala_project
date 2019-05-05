@@ -8,9 +8,16 @@ import java.util.Random;
 
 /**
  * The view class that deals with the visual aspects of the game
+ * @author Trevor O'Neil, Phillip Nguyen, Kunda Wu
+ * @copyright	05/04/2019
+ * @version		1.0
  */
 public class MancalaLabel extends JPanel implements ChangeListener
 {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private Layout layout;  //The game can have different layouts (different board, marbles)
     private MancalaLogic model;    //Need a Model instance variable to access the data from it
     private int[] numMarblesInPits;

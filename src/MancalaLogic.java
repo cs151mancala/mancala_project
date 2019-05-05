@@ -5,6 +5,9 @@ import java.util.Arrays;
 
 /**
  * The model class for Mancala that handles the game logic and data
+ * @author Trevor O'Neil, Phillip Nguyen, Kunda Wu
+ * @copyright	05/04/2019
+ * @version		1.0
  */
 public class MancalaLogic
 {
@@ -84,6 +87,13 @@ public class MancalaLogic
                 prevPits[i] = numberOfStartingMarbles;
             }
         }
+
+        playerATurn = true;
+
+        numUndosPlayerA = 3;
+
+        repeatTurn = false;
+        numUndosPlayerB = 3;
 
         notifyChanges();
     }
@@ -296,7 +306,11 @@ public class MancalaLogic
 
             if (pits[7] > pits[0]) {
                 playerAWon = true;
-            } else {
+            } else if (pits[7] == pits[0]) {
+                playerAWon = true;
+                playerBWon = true;
+            }
+            else {
                 playerBWon = true;
             }
 
@@ -411,6 +425,10 @@ public class MancalaLogic
         return playerBWon;
     }
 
+    /**
+     * Checks if turn is valid
+     * @return true if turn is valid, false otherwise
+     */
     public boolean turnInvalid() {
         if (!turnValid)
             return true;
