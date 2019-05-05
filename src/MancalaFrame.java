@@ -7,7 +7,11 @@ import java.awt.event.MouseEvent;
 
 /**
  * Controller class that connects the model and view class
+ * @author Trevor O'Neil, Phillip Nguyen, Kunda Wu
+ * @copyright	05/04/2019
+ * @version		1.0
  */
+
 public class MancalaFrame extends JFrame {
     /*
      * This block of code is the dimensions of the frame
@@ -28,13 +32,10 @@ public class MancalaFrame extends JFrame {
         this.model = model;
         this.view = view;
 
-        model.addChangeListener(view);   //Adds the view's change listener to the model
-        model.fillPitsWithStartingMarbles(0);
-
-        initialize(model, view);
+        initialize();
     }
 
-    private void initialize(MancalaLogic model, MancalaLabel view) {
+    private void initialize() {
 
         model.addChangeListener(view);   //Adds the view's change listener to the model
         model.fillPitsWithStartingMarbles(0);
@@ -54,36 +55,41 @@ public class MancalaFrame extends JFrame {
             System.exit(0);
         });
 
-        JButton regular = new JButton("Regular layout");
+        JButton regular3 = new JButton("Regular layout [3]");
 
-        regular.addActionListener(e -> {
+        regular3.addActionListener(e -> {
             view.setBoardLayout(new RegularLayout());
-        });
-
-        JButton turtle = new JButton("Turtle format");
-
-        turtle.addActionListener(e -> {
-            view.setBoardLayout(new TurtleLayout());
-        });
-
-        JButton reset4 = new JButton("Reset game [4]");
-        JButton reset3 = new JButton("Reset game [3]");
-
-        reset4.addChangeListener(e -> {
-            model.fillPitsWithStartingMarbles(4);
-        });
-        reset3.addChangeListener(e -> {
             model.fillPitsWithStartingMarbles(3);
         });
 
+        JButton turtle3 = new JButton("Turtle layout [3]");
+
+        turtle3.addActionListener(e -> {
+            view.setBoardLayout(new TurtleLayout());
+            model.fillPitsWithStartingMarbles(3);
+        });
+
+        JButton regular4 = new JButton("Regular layout [4]");
+        JButton turtle4 = new JButton("Turtle layout [4]");
+
+        regular4.addChangeListener(e -> {
+            view.setBoardLayout(new RegularLayout());
+            model.fillPitsWithStartingMarbles(4);
+        });
+
+        turtle4.addChangeListener(e -> {
+            view.setBoardLayout(new TurtleLayout());
+            model.fillPitsWithStartingMarbles(4);
+        });
+
         view.add(undoButton);
-        view.add(reset3);
-        view.add(reset4);
-        view.add(turtle);
-        view.add(regular);
+        view.add(regular3);
+        view.add(regular4);
+        view.add(turtle3);
+        view.add(turtle4);
         view.add(quitButton);
         view.setBoardLayout(new RegularLayout());
-        view.setBoardLayout(new RegularLayout());
+
         this.add(view);
         this.addMouseListener(new Listener());
         this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -210,23 +216,24 @@ public class MancalaFrame extends JFrame {
                 if (model.playerAWon() || model.playerBWon())
                 {
                     int choice;
-                    if (model.playerAWon())
+                    if (model.playerAWon() && model.playerBWon())
+                    {
+                        choice = JOptionPane.showOptionDialog(MancalaFrame.this, "Both are winners",
+                                null, JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Done"}, null);
+                    }
+                    else if (model.playerAWon())
                     {
                         choice = JOptionPane.showOptionDialog(MancalaFrame.this, "Player A won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Ok", "Cancel"}, null);
-                    }
-                    else
-                    {
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Done"}, null);
+                    } else {
                         choice = JOptionPane.showOptionDialog(MancalaFrame.this, "Player B won",
                                 null, JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Ok", "Cancel"}, null);
+                                JOptionPane.PLAIN_MESSAGE, null, new String[]{"Done"}, null);
                     }
+
                     if (choice == JOptionPane.OK_OPTION)
-                    {
-                        System.exit(0);
-                    }
-                    else
                     {
                         System.exit(0);
                     }
@@ -235,3 +242,4 @@ public class MancalaFrame extends JFrame {
         }
     }
 }
+
